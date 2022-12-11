@@ -1,4 +1,4 @@
-Package manager for Linux
+Package manager for Amazon Linux
 
 sudo yum install -y yum-utils shadow-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo

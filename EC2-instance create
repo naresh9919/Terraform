@@ -1,21 +1,14 @@
-vim main.tf  (file name)
+vim ec2.tf  (file name)
 
 
 provider "aws" {
-region = "us-east-1"
+  region = "ap-south-1"
 }
-##First ec2 instance script
-resource "aws_instance" "web" {
-  ami           = "ami-0b0dcb5067f052a63"
-  instance_type = "t2.micro"
 
-  tags = {
-    Name = "Jenkins"
-  }
-}
-output "naresh" {
-description = "using output of instance id"
-value = aws_instance.web.arn
+resource "aws_instance" "demo-server" {
+  ami = "ami-0376ec8eacdf70aae"
+  key_name = "jenkinskey"
+  instance_type = "t2.micro"
 }
 
 
@@ -25,7 +18,7 @@ value = aws_instance.web.arn
 -->  terraform init
 -->  terraform validate
 -->  terraform plan
--->   Create IAM Role --> aws configure --> Access key ID  --> Secret access key
 --> terraform apply --auto-approve  (it will create new instance)
+-->   Create IAM Role --> aws configure --> Access key ID  --> Secret access key
 -->  ls (for .tfstate files)
 --> terraform destroy --auto-approve  (it will delete instanmce)

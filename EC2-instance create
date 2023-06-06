@@ -1,3 +1,6 @@
+-->   Create IAM Role --> with credenatials  
+aws configure --> Access key ID  --> Secret access key
+
 vim ec2.tf  (file name)
 
 
@@ -5,10 +8,13 @@ provider "aws" {
   region = "ap-south-1"
 }
 
-resource "aws_instance" "demo-server" {
-  ami = "ami-0376ec8eacdf70aae"
-  key_name = "jenkinskey"
+resource "aws_instance" "myInstance" {
+  ami           = "ami-0607784b46cbe5816"
   instance_type = "t2.micro"
+
+  tags = {
+    Name = "Jenkins-instance"
+  }
 }
 
 
@@ -19,6 +25,4 @@ resource "aws_instance" "demo-server" {
 -->  terraform validate
 -->  terraform plan
 --> terraform apply --auto-approve  (it will create new instance)
--->   Create IAM Role --> aws configure --> Access key ID  --> Secret access key
--->  ls (for .tfstate files)
 --> terraform destroy --auto-approve  (it will delete instanmce)

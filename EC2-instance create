@@ -14,7 +14,7 @@ resource "aws_instance" "demo-server" {
 
 
 
-
+--> terraform fmt
 -->  terraform init
 -->  terraform validate
 -->  terraform plan

@@ -2,12 +2,12 @@ variable "location" {
     default = "ap-south-1"
 }
 
-variable "os_name" {
-    default = "ami-09ba48996007c8b50"
+variable "os-name" {
+    default = "ami-0607784b46cbe5816"
 }
 
-variable "key" {
-    default = "rtp-03"
+variable "key-pair" {
+    default = "terraform"
 }
 
 variable "instance-type" {

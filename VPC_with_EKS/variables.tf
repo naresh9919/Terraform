@@ -2,12 +2,12 @@ variable "location" {
     default = "ap-south-1"
 }
 
-variable "os-name" {
+variable "os_name" {
     default = "ami-0607784b46cbe5816"
 }
 
-variable "key-pair" {
-    default = "terraform"
+variable "key" {
+    default = "rtp-03"
 }
 
 variable "instance-type" {
@@ -22,6 +22,13 @@ variable "subnet1-cidr" {
     default = "10.10.1.0/24"
   
 }
+variable "subnet2-cidr" {
+    default = "10.10.2.0/24"
+  
+}
 variable "subent_az" {
     default =  "ap-south-1a"  
+}
+variable "subent_az1" {
+    default =  "ap-south-1b"  
 }

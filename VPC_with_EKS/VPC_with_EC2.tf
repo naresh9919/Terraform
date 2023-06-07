@@ -2,76 +2,78 @@ provider "aws" {
   region = var.location
 }
 
-resource "aws_instance" "Jenkins-instance" {
-  ami           = var.os-name
-  instance_type = var.instance-type
-  key_name = var.key-pair
-  subnet_id = aws_subnet.Demo-public_subent_01.id
-  vpc_security_group_ids = [aws_security_group.jenkins-sg.id]
+resource "aws_instance" "demo-server" {
+ ami = var.os_name
+ key_name = var.key 
+ instance_type  = var.instance-type
+ associate_public_ip_address = true
+subnet_id = aws_subnet.demo_subnet_01.id
+vpc_security_group_ids = [aws_security_group.demo-vpc-sg.id]
+}
 
- tags = {
-    Name = "Jenkins-instance"
+// Create VPC
+resource "aws_vpc" "demo-vpc" {
+  cidr_block = var.vpc-cidr
+}
+
+// Create Subnet
+resource "aws_subnet" "demo_subnet_01" {
+  vpc_id     = aws_vpc.demo-vpc.id 
+  cidr_block = var.subnet1-cidr
+  availability_zone = var.subent_az
+
+  tags = {
+    Name = "demo_subnet"
   }
 }
 
-# creating vpc
+resource "aws_subnet" "demo_subnet_02" {
+  vpc_id     = aws_vpc.demo-vpc.id 
+  cidr_block = var.subnet2-cidr
+  availability_zone = var.subent_az1
 
-resource "aws_vpc" "Demo-vpc" {
-    cidr_block = var.vpc-cidr
-    tags = {
-      Name = "Demo-vpc"
-    }
-  
+  tags = {
+    Name = "demo_subnet"
+  }
 }
 
-resource "aws_subnet" "Demo-public_subent_01" {
-    vpc_id = "${aws_vpc.Demo-vpc.id}"
-    cidr_block = var.subnet1-cidr
-    map_public_ip_on_launch = "true"
-    availability_zone = var.subent_az
-    tags = {
-      Name = "Demo-public_subent_01"
-    }
-  
+// Create Internet Gateway
+
+resource "aws_internet_gateway" "demo-igw" {
+  vpc_id = aws_vpc.demo-vpc.id
+
+  tags = {
+    Name = "demo-igw"
+  }
 }
 
-//Creating a Internet Gateway
+resource "aws_route_table" "demo-rt" {
+  vpc_id = aws_vpc.demo-vpc.id
 
-resource "aws_internet_gateway" "Demo-igw" {
-    vpc_id = "${aws_vpc.Demo-vpc.id}"
-    tags = {
-      Name = "Demo-igw"
-    }
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.demo-igw.id
+  }
+  tags = {
+    Name = "demo-rt"
+  }
 }
 
-// Create a route table 
+// associate subnet with route table 
+resource "aws_route_table_association" "demo-rt_association" {
+  subnet_id      = aws_subnet.demo_subnet_01.id
 
-resource "aws_route_table" "Demo-public-rt" {
-    vpc_id = "${aws_vpc.Demo-vpc.id}"
-    route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = "${aws_internet_gateway.Demo-igw.id}"
-    }
-    tags = {
-      Name = "Demo-public-rt"
-    }
+  route_table_id = aws_route_table.demo-rt.id
 }
+// create a security group 
 
-// Associate subnet with routetable 
-
-resource "aws_route_table_association" "Demo-rta-public-subent-1" {
-    subnet_id = "${aws_subnet.Demo-public_subent_01.id}"
-    route_table_id = "${aws_route_table.Demo-public-rt.id}"
-  
-}
-
-// create a security group
-
-resource "aws_security_group" "jenkins-sg" {
-  name        = "jenkins-sg"
-  vpc_id      = aws_vpc.Demo-vpc.id
+resource "aws_security_group" "demo-vpc-sg" {
+  name        = "demo-vpc-sg"
+ 
+  vpc_id      = aws_vpc.demo-vpc.id
 
   ingress {
+
     from_port        = 22
     to_port          = 22
     protocol         = "tcp"
@@ -88,6 +90,18 @@ resource "aws_security_group" "jenkins-sg" {
   }
 
   tags = {
-    Name = "jenkins-sg"
+    Name = "allow_tls"
   }
+}
+module "sgs" {
+  source = "./sg_eks"
+  vpc_id = aws_vpc.demo-vpc.id
+  
+}
+
+module "eks" {
+  source = "./eks"
+  sg_ids = module.sgs.security_group_public
+  vpc_id = aws_vpc.demo-vpc.id
+  subnet_ids = [aws_subnet.demo_subnet_01.id,aws_subnet.demo_subnet_02.id]
 }

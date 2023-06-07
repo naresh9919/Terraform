@@ -7,7 +7,7 @@ variable "os_name" {
 }
 
 variable "key" {
-    default = "rtp-03"
+    default = "terraform"
 }
 
 variable "instance-type" {
